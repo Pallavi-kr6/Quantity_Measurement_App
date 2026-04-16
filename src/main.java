@@ -1,9 +1,11 @@
 public class QuantityMeasurementApp {
 
-    // 🔹 Step 1: Enum for Units (base unit = feet)
+    // 🔹 Step 1: Enum with all units (base unit = FEET)
     enum LengthUnit {
-        FEET(1.0),
-        INCH(1.0 / 12.0);
+        FEET(1.0),                         // base
+        INCH(1.0 / 12.0),                  // 1 inch = 1/12 feet
+        YARD(3.0),                         // 1 yard = 3 feet
+        CENTIMETER(0.0328084);             // 1 cm ≈ 0.0328084 feet
 
         private final double toFeetFactor;
 
@@ -16,7 +18,7 @@ public class QuantityMeasurementApp {
         }
     }
 
-    // 🔹 Step 2: Generic Quantity Class
+    // 🔹 Step 2: Generic Quantity Class (same as UC3)
     static class QuantityLength {
         private double value;
         private LengthUnit unit;
@@ -38,13 +40,13 @@ public class QuantityMeasurementApp {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj) return true;              // Same reference
-            if (obj == null) return false;             // Null check
-            if (!(obj instanceof QuantityLength)) return false; // Type check
+            if (this == obj) return true;                // Reflexive
+            if (obj == null) return false;               // Null-safe
+            if (!(obj instanceof QuantityLength)) return false;
 
             QuantityLength other = (QuantityLength) obj;
 
-            // Convert both to same base unit (feet)
+            // Compare after converting both to base unit (feet)
             return Double.compare(this.toFeet(), other.toFeet()) == 0;
         }
     }
@@ -52,29 +54,46 @@ public class QuantityMeasurementApp {
     // 🔹 Main Method (Demo)
     public static void main(String[] args) {
 
-        // Same unit equality
-        QuantityLength q1 = new QuantityLength(1.0, LengthUnit.FEET);
-        QuantityLength q2 = new QuantityLength(1.0, LengthUnit.FEET);
-        System.out.println("1 ft vs 1 ft: " + q1.equals(q2));
+        // 🔸 Basic equality
+        System.out.println("1 ft vs 1 ft: " +
+                new QuantityLength(1.0, LengthUnit.FEET)
+                        .equals(new QuantityLength(1.0, LengthUnit.FEET)));
 
-        // Inch equality
-        QuantityLength q3 = new QuantityLength(1.0, LengthUnit.INCH);
-        QuantityLength q4 = new QuantityLength(1.0, LengthUnit.INCH);
-        System.out.println("1 inch vs 1 inch: " + q3.equals(q4));
+        System.out.println("1 inch vs 1 inch: " +
+                new QuantityLength(1.0, LengthUnit.INCH)
+                        .equals(new QuantityLength(1.0, LengthUnit.INCH)));
 
-        // Cross-unit equality
-        QuantityLength q5 = new QuantityLength(1.0, LengthUnit.FEET);
-        QuantityLength q6 = new QuantityLength(12.0, LengthUnit.INCH);
-        System.out.println("1 ft vs 12 inch: " + q5.equals(q6));
+        // 🔸 Yard conversions
+        System.out.println("1 yard vs 3 feet: " +
+                new QuantityLength(1.0, LengthUnit.YARD)
+                        .equals(new QuantityLength(3.0, LengthUnit.FEET)));
 
-        // Different values
-        QuantityLength q7 = new QuantityLength(2.0, LengthUnit.FEET);
-        System.out.println("1 ft vs 2 ft: " + q5.equals(q7));
+        System.out.println("1 yard vs 36 inches: " +
+                new QuantityLength(1.0, LengthUnit.YARD)
+                        .equals(new QuantityLength(36.0, LengthUnit.INCH)));
 
-        // Same reference
-        System.out.println("Same reference: " + q5.equals(q5));
+        // 🔸 Centimeter conversions
+        System.out.println("1 cm vs 0.393701 inch: " +
+                new QuantityLength(1.0, LengthUnit.CENTIMETER)
+                        .equals(new QuantityLength(0.393701, LengthUnit.INCH)));
 
-        // Null comparison
-        System.out.println("Null comparison: " + q5.equals(null));
+        // 🔸 Different values
+        System.out.println("1 yard vs 2 feet: " +
+                new QuantityLength(1.0, LengthUnit.YARD)
+                        .equals(new QuantityLength(2.0, LengthUnit.FEET)));
+
+        // 🔸 Transitive property
+        QuantityLength a = new QuantityLength(1.0, LengthUnit.YARD);
+        QuantityLength b = new QuantityLength(3.0, LengthUnit.FEET);
+        QuantityLength c = new QuantityLength(36.0, LengthUnit.INCH);
+
+        System.out.println("Transitive (yard=feet & feet=inch): " +
+                (a.equals(b) && b.equals(c) && a.equals(c)));
+
+        // 🔸 Same reference
+        System.out.println("Same reference: " + a.equals(a));
+
+        // 🔸 Null comparison
+        System.out.println("Null comparison: " + a.equals(null));
     }
 }
